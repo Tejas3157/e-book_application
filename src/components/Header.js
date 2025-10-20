@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar';
 
 function Header() {
     return (
-     <Navbar expand="lg" style={{ background: 'linear-gradient(135deg, #1C2E4C 0%, #03618dff 100%)' }} variant="dark">
+     <Navbar expand="lg" style={{ background: 'linear-gradient(90deg, #03618dff 100% , #1C2E4C 0%)' }} variant="dark">
             <Container>
                 {/* Left: Logo */}
                 <Navbar.Brand href="/" style={{ fontWeight: 'bold', letterSpacing: '2px', marginRight: '100px' }}>

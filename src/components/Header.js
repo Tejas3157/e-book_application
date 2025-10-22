@@ -2,10 +2,12 @@ import React from 'react'
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import { Link } from 'react-router-dom';
 
 function Header() {
     return (
-     <Navbar expand="lg" style={{ background: 'linear-gradient(90deg, #03618dff 100% , #1C2E4C 0%)' }} variant="dark">
+
+         <Navbar expand="lg" style={{ background: 'linear-gradient(90deg, #03618dff 100% , #1C2E4C 0%)' }} variant="dark">
             <Container>
                 {/* Left: Logo */}
                 <Navbar.Brand href="/" style={{ fontWeight: 'bold', letterSpacing: '2px', marginRight: '100px' }}>

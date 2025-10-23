@@ -66,7 +66,7 @@ function LandingPage() {
                     Welcome to <span style={{ color: "#00d4ff" }}>Book</span>
                     <span style={{ color: "#ff8a00" }}>Verse</span>
                 </h1>
-                <p className="lead mx-auto mb-4" style={{ maxWidth: "700px", lineHeight: "1.8", fontSize: "1.2rem" }}>
+                <p className="lead mx-auto mb-4 text-break " style={{ maxWidth: "700px", lineHeight: "1.8", fontSize: "1.2rem" }}>
                     Dive into an boundless universe of stories, knowledge, and inspiration. Bookverse brings thousands of e-books directly to your fingertips, transforming the way you read. Discover new authors, explore hidden gems, and enrich your mind with our ever-expanding digital library. Experience seamless reading across all your devices, personalized recommendations, and a community dedicated to the love of books.
                 </p>
                 <div className="mt-4">

@@ -7,6 +7,7 @@ import LandingPage from './components/Landingpage/LandingPage';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/AuthenticationPages/Login';
 import Signup from './components/AuthenticationPages/Signup';
+import Dashboard from './components/Landingpage/Dashboard';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
               <Route path="/" element={<LandingPage />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </div>
           <Footer />

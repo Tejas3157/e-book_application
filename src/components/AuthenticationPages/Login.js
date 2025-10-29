@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { FaUser, FaLock } from 'react-icons/fa';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -23,68 +25,91 @@ function Login() {
 
     setTimeout(() => {
       setLoading(false);
-      // if (email === 'admin' && password === 'admin') {
-      //   navigate('/dashboard');
-      // } else {
-      //   setToast({ show: true, message: 'Invalid credentials' });
-      // }
-
-      (email === 'admin' && password === 'admin')
-        ? navigate('/dashboard')
-        : setToast({ show: true, message: 'Invalid credentials' });
+      if (email === 'admin' && password === 'admin') {
+        localStorage.setItem('userToken', 'sampleToken'); // ✅ Add this line
+        navigate('/dashboard');
+      } else {
+        setToast({ show: true, message: 'Invalid credentials' });
+      }
     }, 1000);
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '80vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
-      <div className="p-5 rounded shadow" style={{ background: '#fff', minWidth: 350 }}>
-        <h2 className="mb-4 text-center" style={{ color: '#2563eb' }}>Login</h2>
-        <form
-        //  onSubmit={handleSubmit}
-        >
-          <div className="mb-3">
-            <label className="form-label">Username</label>
-            <input
-              type="text"
-              className="form-control"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              autoFocus
-              placeholder="Enter username"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              required
-              placeholder="Enter password"
-            />
-          </div>
-          <button
-            onClick={handleSubmit}
-            type='button'
-            // type="submit"
-            className="btn btn-primary w-100"
-            disabled={loading}
-          >
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
-        </form>
-        {/* Toast Message */}
-        {toast.show && (
-          <div className="toast show align-items-center text-bg-danger border-0 mt-3 w-100" style={{ zIndex: 999 }}>
-            <div className="d-flex">
-              <div className="toast-body">
-                {toast.message}
+    <div
+      className="d-flex justify-content-center align-items-center min-vh-100"
+      style={{
+        background: 'linear-gradient(135deg,  #000428, #004e92)',
+      }}
+    >
+      <div className="card shadow-lg border-0" style={{ width: '100%', maxWidth: 420 }}>
+        <div className="card-body p-5">
+          <h2 className="text-center mb-4 fw-bold text-primary">Log In</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3 position-relative">
+              <label className="form-label fw-semibold">Username</label>
+              <div className="input-group">
+                <span className="input-group-text bg-white">
+                  <FaUser />
+                </span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Email or Phone Number"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
             </div>
+
+            <div className="mb-3 position-relative">
+              <label className="form-label fw-semibold">Password</label>
+              <div className="input-group">
+                <span className="input-group-text bg-white">
+                  <FaLock />
+                </span>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Enter Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn btn-success w-100 py-2 fw-semibold"
+              disabled={loading}
+            >
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+
+          {/* Sign-up redirect */}
+          <div className="text-center mt-4">
+            <span className="text-muted">Don't have an account? </span>
+            <a href="/signup" className="text-decoration-none fw-semibold text-primary">
+              Sign up
+            </a>
           </div>
-        )}
+
+          {/* Toast Notification */}
+          {toast.show && (
+            <div
+              className="toast align-items-center text-bg-danger border-0 show mt-3 w-100"
+              role="alert"
+              aria-live="assertive"
+              aria-atomic="true"
+            >
+              <div className="d-flex">
+                <div className="toast-body">{toast.message}</div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -124,11 +124,14 @@ function Dashboard() {
       <div className="fixed-top shadow-sm" style={{ background: "linear-gradient(90deg, #000428 100%, #004e92 0%)", zIndex: 1030 }}>
         <nav className="navbar navbar-expand-lg navbar-dark py-3">
           <div className="container-fluid">
-            <a className="navbar-brand d-flex align-items-center ms-lg-3 fs-3 fw-bold" style={{ cursor: 'pointer' }}>
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="navbar-brand d-flex align-items-center ms-lg-3 fs-3 fw-bold border-0 bg-transparent"
+            >
               <img src={Image} alt="Logo" width="50" height="40" className="me-2" />
               <span style={{ color: "#00d4ff" }}>Book</span>
               <span style={{ color: "#ff8a00" }}>Verse</span>
-            </a>
+            </button>
 
             <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
               <span className="navbar-toggler-icon"></span>

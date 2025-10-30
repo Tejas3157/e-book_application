@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Image from '../Images/Logo.png';
@@ -57,10 +57,6 @@ function Dashboard() {
     fetchBooks();
   }, []);
 
-  useEffect(() => {
-    handleFilter();
-  }, [searchQuery, category, sortBy, books]);
-
   const handleSearch = (e) => {
     e.preventDefault();
     let query = searchQuery.trim() || 'bestseller';
@@ -72,7 +68,7 @@ function Dashboard() {
     fetchBooks(query, sortBy);
   };
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     let filtered = [...books];
 
     // Filter by search query in title or author
@@ -107,7 +103,11 @@ function Dashboard() {
     }
 
     setFilteredBooks(filtered);
-  };
+  }, [books, searchQuery, sortBy]);
+
+  useEffect(() => {
+    handleFilter();
+  }, [handleFilter]);
 
   const handleLogout = (e) => {
     e.preventDefault();

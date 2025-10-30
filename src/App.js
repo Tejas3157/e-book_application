@@ -3,7 +3,7 @@ import Header from './components/Header';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Footer from './components/Footer';
-import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/AuthenticationPages/Login';
 import Signup from './components/AuthenticationPages/Signup';
 import Dashboard from './components/pages/Dashboard';

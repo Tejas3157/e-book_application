@@ -45,12 +45,12 @@ function Header() {
                             <ul className="navbar-nav mx-auto text-center h4 my-2 my-lg-0">
                                 {['Home', 'About', 'Contact'].map((item) => (
                                     <li key={item} className="nav-item mx-lg-3 position-relative">
-                                        <Link
+                                        <a
                                             className="nav-link fw-semibold nav-animate"
-                                            to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
+                                            href={item === 'Home' ? '#home' : `#${item.toLowerCase()}`}
                                         >
                                             {item}
-                                        </Link>
+                                        </a>
                                     </li>
                                 ))}
                             </ul>

@@ -8,8 +8,6 @@ import Login from './components/AuthenticationPages/Login';
 import Signup from './components/AuthenticationPages/Signup';
 import Dashboard from './components/pages/Dashboard';
 import Home from './components/Landingpage/Home';
-import About from './components/Landingpage/About';
-import Contact from './components/Landingpage/Contact';
 import ProtectedRoute from './components/ProtectedRoute';
 import BookDetails from './components/pages/BookDetails';
 import UserProfile from './components/pages/UserProfile';
@@ -27,20 +25,6 @@ function App() {
           <>
             <Header />
             <Home />
-            <Footer />
-          </>
-        } />
-        <Route path="/about" element={
-          <>
-            <Header />
-            <About />
-            <Footer />
-          </>
-        } />
-        <Route path="/contact" element={
-          <>
-            <Header />
-            <Contact />
             <Footer />
           </>
         } />

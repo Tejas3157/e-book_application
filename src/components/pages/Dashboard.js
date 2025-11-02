@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import Image from '../Images/Logo.png';
-import { FaSearch, FaFilter, FaHeart, FaShoppingCart, FaBook, FaUser } from 'react-icons/fa';
+import DashboardLayout from './DashboardLayout';
+import { FaSearch, FaFilter } from 'react-icons/fa';
 
 function Dashboard() {
   const [books, setBooks] = useState([]);
@@ -57,6 +57,10 @@ function Dashboard() {
     fetchBooks();
   }, []);
 
+  useEffect(() => {
+    handleFilter();
+  }, [searchQuery, category, sortBy, books]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     let query = searchQuery.trim() || 'bestseller';
@@ -68,10 +72,9 @@ function Dashboard() {
     fetchBooks(query, sortBy);
   };
 
-  const handleFilter = useCallback(() => {
+  const handleFilter = () => {
     let filtered = [...books];
 
-    // Filter by search query in title or author
     if (searchQuery) {
       filtered = filtered.filter(book => {
         const title = book.volumeInfo?.title?.toLowerCase() || '';
@@ -81,7 +84,6 @@ function Dashboard() {
       });
     }
 
-    // Sort books
     if (sortBy === 'title') {
       filtered.sort((a, b) => {
         const titleA = a.volumeInfo?.title || '';
@@ -103,234 +105,155 @@ function Dashboard() {
     }
 
     setFilteredBooks(filtered);
-  }, [books, searchQuery, sortBy]);
-
-  useEffect(() => {
-    handleFilter();
-  }, [handleFilter]);
-
-  const handleLogout = (e) => {
-    e.preventDefault();
-    localStorage.removeItem('userToken');
-    navigate('/');
   };
 
-  const cartCount = JSON.parse(localStorage.getItem('cart'))?.length || 0;
-  const wishlistCount = JSON.parse(localStorage.getItem('wishlist'))?.length || 0;
-
   return (
-    <div>
-      {/* Header */}
-      <div className="fixed-top shadow-sm" style={{ background: "linear-gradient(90deg, #000428 100%, #004e92 0%)", zIndex: 1030 }}>
-        <nav className="navbar navbar-expand-lg navbar-dark py-3">
-          <div className="container-fluid">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="navbar-brand d-flex align-items-center ms-lg-3 fs-3 fw-bold border-0 bg-transparent"
-            >
-              <img src={Image} alt="Logo" width="50" height="40" className="me-2" />
-              <span style={{ color: "#00d4ff" }}>Book</span>
-              <span style={{ color: "#ff8a00" }}>Verse</span>
-            </button>
+    <DashboardLayout>
+      {/* Search and Filter Section */}
+      <div className="card shadow-lg border-0 mb-4">
+        <div className="card-body p-3 p-md-4">
+          <form onSubmit={handleSearch}>
+            <div className="row g-3">
+              <div className="col-12 col-md-5">
+                <div className="input-group">
+                  <span className="input-group-text bg-primary text-white">
+                    <FaSearch />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search by title or author..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+              </div>
 
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span className="navbar-toggler-icon"></span>
-            </button>
+              <div className="col-6 col-md-3">
+                <div className="input-group">
+                  <span className="input-group-text bg-info text-white">
+                    <FaFilter />
+                  </span>
+                  <select
+                    className="form-select"
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-            <div className="collapse navbar-collapse" id="navbarNav">
-              <ul className="navbar-nav mx-auto text-center my-2 my-lg-0">
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white" onClick={() => navigate('/dashboard')}>
-                    Dashboard
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white position-relative" onClick={() => navigate('/reading-list')}>
-                    <FaBook className="me-1" /> Reading List
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white position-relative" onClick={() => navigate('/wishlist')}>
-                    <FaHeart className="me-1" /> Wishlist
-                    {wishlistCount > 0 && (
-                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {wishlistCount}
-                      </span>
-                    )}
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white position-relative" onClick={() => navigate('/cart')}>
-                    <FaShoppingCart className="me-1" /> Cart
-                    {cartCount > 0 && (
-                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              </ul>
+              <div className="col-6 col-md-2">
+                <select
+                  className="form-select"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="relevance">Relevance</option>
+                  <option value="title">Title A-Z</option>
+                  <option value="rating">Rating</option>
+                  <option value="newest">Newest</option>
+                </select>
+              </div>
 
-              <div className="d-flex justify-content-center justify-content-lg-end mt-2 mt-lg-0 gap-2">
-                <button className="btn btn-outline-info rounded-pill" onClick={() => navigate('/profile')}>
-                  <FaUser className="me-1" /> Profile
-                </button>
-                <button onClick={handleLogout} className="btn btn-danger rounded-pill">
-                  Logout
+              <div className="col-12 col-md-2">
+                <button type="submit" className="btn btn-success w-100" disabled={loading}>
+                  {loading ? 'Searching...' : 'Search'}
                 </button>
               </div>
             </div>
-          </div>
-        </nav>
+          </form>
+        </div>
       </div>
 
-      {/* Main Content */}
-      <section style={{ background: 'linear-gradient(135deg, #000428, #004e92)', minHeight: '100vh', paddingTop: '100px' }}>
-        <div className="container py-4">
-          {/* Search and Filter Section */}
-          <div className="card shadow-lg border-0 mb-4">
-            <div className="card-body p-4">
-              <form onSubmit={handleSearch}>
-                <div className="row g-3">
-                  {/* Search Input */}
-                  <div className="col-md-5">
-                    <div className="input-group">
-                      <span className="input-group-text bg-primary text-white">
-                        <FaSearch />
-                      </span>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Search by title or author..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                      />
-                    </div>
-                  </div>
+      {/* Results Count */}
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h5 className="text-white mb-0">
+          {filteredBooks.length} Book{filteredBooks.length !== 1 ? 's' : ''} Found
+        </h5>
+      </div>
 
-                  {/* Category Filter */}
-                  <div className="col-md-3">
-                    <div className="input-group">
-                      <span className="input-group-text bg-info text-white">
-                        <FaFilter />
-                      </span>
-                      <select
-                        className="form-select"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                      >
-                        {categories.map(cat => (
-                          <option key={cat} value={cat}>
-                            {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
+      {/* Error Message */}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-                  {/* Sort By */}
-                  <div className="col-md-2">
-                    <select
-                      className="form-select"
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value)}
-                    >
-                      <option value="relevance">Relevance</option>
-                      <option value="title">Title A-Z</option>
-                      <option value="rating">Rating</option>
-                      <option value="newest">Newest</option>
-                    </select>
-                  </div>
-
-                  {/* Search Button */}
-                  <div className="col-md-2">
-                    <button type="submit" className="btn btn-success w-100" disabled={loading}>
-                      {loading ? 'Searching...' : 'Search'}
-                    </button>
-                  </div>
-                </div>
-              </form>
+      {/* Books Grid */}
+      <div className="row g-3">
+        {loading ? (
+          <div className="col-12 text-center text-white py-5">
+            <div className="spinner-border" role="status">
+              <span className="visually-hidden">Loading...</span>
             </div>
+            <p className="mt-3">Loading books...</p>
           </div>
-
-          {/* Results Count */}
-          <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="text-white mb-0">
-              {filteredBooks.length} Book{filteredBooks.length !== 1 ? 's' : ''} Found
-            </h4>
+        ) : filteredBooks.length === 0 ? (
+          <div className="col-12 text-center text-white py-5">
+            <h5>No books found matching your criteria.</h5>
+            <button 
+              className="btn btn-warning mt-3" 
+              onClick={() => { 
+                setSearchQuery(''); 
+                setCategory('all'); 
+                fetchBooks(); 
+              }}
+            >
+              Reset Filters
+            </button>
           </div>
+        ) : (
+          filteredBooks.map(item => {
+            const info = item.volumeInfo || {};
+            const title = info.title || 'Untitled';
+            const authors = info.authors ? info.authors.join(', ') : 'Unknown author';
+            const image = (info.imageLinks && (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail)) || '';
+            const rating = info.averageRating || '—';
 
-          {/* Error Message */}
-          {error && <div className="alert alert-danger">{error}</div>}
-
-          {/* Books Grid */}
-          <div className="row">
-            {loading ? (
-              <div className="text-center text-white py-5">
-                <div className="spinner-border" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-                <p className="mt-3">Loading books...</p>
-              </div>
-            ) : filteredBooks.length === 0 ? (
-              <div className="text-center text-white py-5">
-                <h5>No books found matching your criteria.</h5>
-                <button className="btn btn-warning mt-3" onClick={() => { setSearchQuery(''); setCategory('all'); fetchBooks(); }}>
-                  Reset Filters
-                </button>
-              </div>
-            ) : (
-              filteredBooks.map(item => {
-                const info = item.volumeInfo || {};
-                const title = info.title || 'Untitled';
-                const authors = info.authors ? info.authors.join(', ') : 'Unknown author';
-                const image = (info.imageLinks && (info.imageLinks.thumbnail || info.imageLinks.smallThumbnail)) || '';
-                const rating = info.averageRating || '—';
-
-                return (
-                  <div className="col-6 col-sm-4 col-md-3 col-lg-2 mb-4" key={item.id}>
-                    <div 
-                      className="card h-100 shadow-sm border-0" 
-                      style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                      onClick={() => navigate(`/book/${item.id}`)}
+            return (
+              <div className="col-6 col-sm-4 col-md-3 col-xl-2 mb-3" key={item.id}>
+                <div 
+                  className="card h-100 shadow-sm border-0" 
+                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  onClick={() => navigate(`/book/${item.id}`)}
+                >
+                  {image ? (
+                    <img
+                      src={image}
+                      alt={title}
+                      className="card-img-top"
+                      style={{ height: '250px', objectFit: 'cover', borderRadius: '8px 8px 0 0' }}
+                    />
+                  ) : (
+                    <div
+                      className="card-img-top d-flex align-items-center justify-content-center bg-light text-muted"
+                      style={{ height: '250px', borderRadius: '8px 8px 0 0' }}
                     >
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={title}
-                          className="card-img-top"
-                          style={{ height: '250px', objectFit: 'cover', borderRadius: '8px 8px 0 0' }}
-                        />
-                      ) : (
-                        <div
-                          className="card-img-top d-flex align-items-center justify-content-center bg-light text-muted"
-                          style={{ height: '250px', borderRadius: '8px 8px 0 0' }}
-                        >
-                          No Image
-                        </div>
-                      )}
-                      <div className="card-body p-2">
-                        <h6 className="card-title mb-1 text-truncate" style={{ fontSize: '1rem', fontWeight: 600 }}>
-                          {title}
-                        </h6>
-                        <p className="card-text mb-0 text-truncate" style={{ fontSize: '0.85rem', color: '#888' }}>
-                          {authors}
-                        </p>
-                        <p className="card-text mt-1" style={{ fontSize: '0.85rem', color: '#888' }}>
-                          ⭐ {rating}
-                        </p>
-                      </div>
+                      No Image
                     </div>
+                  )}
+                  <div className="card-body p-2">
+                    <h6 className="card-title mb-1 text-truncate" style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                      {title}
+                    </h6>
+                    <p className="card-text mb-0 text-truncate" style={{ fontSize: '0.75rem', color: '#888' }}>
+                      {authors}
+                    </p>
+                    <p className="card-text mt-1" style={{ fontSize: '0.75rem', color: '#888' }}>
+                      ⭐ {rating}
+                    </p>
                   </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-      </section>
-    </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </DashboardLayout>
   );
 }
 

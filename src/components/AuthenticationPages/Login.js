@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaUser, FaLock } from 'react-icons/fa';
 
@@ -91,9 +91,9 @@ function Login() {
           {/* Sign-up redirect */}
           <div className="text-center mt-4">
             <span className="text-muted">Don't have an account? </span>
-            <a href="/signup" className="text-decoration-none fw-semibold text-primary">
+            <Link to="/signup" className="text-decoration-none fw-semibold text-primary">
               Sign up
-            </a>
+            </Link>
           </div>
 
           {/* Toast Notification */}

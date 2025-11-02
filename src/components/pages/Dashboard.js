@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
@@ -57,9 +57,6 @@ function Dashboard() {
     fetchBooks();
   }, []);
 
-  useEffect(() => {
-    handleFilter();
-  }, [searchQuery, category, sortBy, books]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -72,7 +69,7 @@ function Dashboard() {
     fetchBooks(query, sortBy);
   };
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     let filtered = [...books];
 
     if (searchQuery) {
@@ -81,6 +78,15 @@ function Dashboard() {
         const authors = book.volumeInfo?.authors?.join(' ').toLowerCase() || '';
         return title.includes(searchQuery.toLowerCase()) || 
                authors.includes(searchQuery.toLowerCase());
+      });
+    }
+
+    // client-side category filtering when category is not 'all'
+    if (category && category !== 'all') {
+      filtered = filtered.filter(book => {
+        const cats = book.volumeInfo?.categories || [];
+        // categories can be strings like "Fiction" or arrays; normalize to array
+        return cats.some(cat => cat.toLowerCase().includes(category.toLowerCase()));
       });
     }
 
@@ -105,7 +111,11 @@ function Dashboard() {
     }
 
     setFilteredBooks(filtered);
-  };
+  }, [books, searchQuery, sortBy, category]);
+
+  useEffect(() => {
+    handleFilter();
+  }, [handleFilter]);
 
   return (
     <DashboardLayout>

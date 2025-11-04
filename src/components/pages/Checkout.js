@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DashboardLayout from '../DashboardLayout';
+import DashboardLayout from './DashboardLayout';
 import { FaCreditCard, FaLock, FaCheckCircle } from 'react-icons/fa';
 
 function Checkout() {

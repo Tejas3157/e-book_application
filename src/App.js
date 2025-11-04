@@ -15,6 +15,9 @@ import ReadingList from './components/pages/ReadingList';
 import Wishlist from './components/pages/Wishlist';
 import Cart from './components/pages/Cart';
 import BookReader from './components/pages/BookReader';
+import Checkout from './components/pages/Checkout';
+import NotFound from './components/pages/NotFound';
+
 
 function App() {
   return (
@@ -69,6 +72,14 @@ function App() {
             <Cart />
           </ProtectedRoute>
         } />
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <Checkout />
+          </ProtectedRoute>
+        } />
+
+        {/* 404 Not Found - Catch all routes */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

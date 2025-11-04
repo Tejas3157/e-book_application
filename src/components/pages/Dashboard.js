@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
@@ -12,7 +12,6 @@ function Dashboard() {
   const [category, setCategory] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [loading, setLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
 
   const categories = [
@@ -70,7 +69,7 @@ function Dashboard() {
     fetchBooks(query, sortBy);
   };
 
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     let filtered = [...books];
 
     if (searchQuery) {

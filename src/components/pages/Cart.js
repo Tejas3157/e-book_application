@@ -20,7 +20,7 @@ function Cart() {
       <div className="mb-4">
         <h3 className="fw-bold text-white">
           <FaCreditCard className="me-2" />
-          My Cart
+          My Cart ({cart.length} items)
         </h3>
       </div>
       
@@ -51,9 +51,10 @@ function Cart() {
                   />
                   <div className="card-body text-center p-2">
                     <h6 className="text-truncate">{book.volumeInfo.title}</h6>
-                    <small className="text-muted d-block mb-2">
+                    <small className="text-muted d-block mb-1">
                       {book.volumeInfo.authors?.[0] || "Unknown"}
                     </small>
+                    <p className="text-success fw-bold mb-2">$10.99</p>
                     <button
                       className="btn btn-outline-danger btn-sm w-100"
                       onClick={() => removeItem(book.id)}
@@ -67,12 +68,34 @@ function Cart() {
             
             <div className="col-12 mt-4">
               <div className="card shadow-lg border-0">
-                <div className="card-body p-4 d-flex justify-content-between align-items-center">
-                  <h4 className="mb-0">Total: ${total.toFixed(2)}</h4>
-                  <button className="btn btn-success btn-lg">
-                    <FaCreditCard className="me-2" />
-                    Proceed to Checkout
-                  </button>
+                <div className="card-body p-4">
+                  <div className="row align-items-center">
+                    <div className="col-md-6">
+                      <h4 className="mb-2">Order Summary</h4>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Subtotal ({cart.length} items):</span>
+                        <span className="fw-bold">${total.toFixed(2)}</span>
+                      </div>
+                      <div className="d-flex justify-content-between mb-2">
+                        <span>Tax (10%):</span>
+                        <span className="fw-bold">${(total * 0.1).toFixed(2)}</span>
+                      </div>
+                      <hr />
+                      <div className="d-flex justify-content-between">
+                        <h5 className="mb-0">Total:</h5>
+                        <h5 className="mb-0 text-success">${(total * 1.1).toFixed(2)}</h5>
+                      </div>
+                    </div>
+                    <div className="col-md-6 text-md-end mt-3 mt-md-0">
+                      <button 
+                        className="btn btn-success btn-lg"
+                        onClick={() => navigate('/checkout')}
+                      >
+                        <FaCreditCard className="me-2" />
+                        Proceed to Checkout
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

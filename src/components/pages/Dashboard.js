@@ -223,7 +223,7 @@ function Dashboard() {
             const rating = info.averageRating || '—';
 
             return (
-              <div className="col-6 col-sm-4 col-md-3 col-xl-3 mb-3" key={item.id}>
+              <div className="col-6 col-sm-4 col-md-3 col-xl-2 mb-3" key={item.id}>
                 <div 
                   className="card h-100 shadow-sm border-0" 
                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}

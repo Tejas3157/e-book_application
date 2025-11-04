@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaEnvelope, FaPhone, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 function Signup() {
   const [fname, setFname] = useState('');
@@ -164,9 +165,9 @@ function Signup() {
             {/* Login Redirect */}
             <div className="text-center mt-3">
               <span className="text-muted">Already have an account? </span>
-              <a href="/login" className="text-decoration-none fw-semibold text-primary">
+              <Link to="/login" className="text-decoration-none fw-semibold text-primary">
                 Log in
-              </a>
+              </Link>
             </div>
           </form>
 

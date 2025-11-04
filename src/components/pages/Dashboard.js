@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Image from '../Images/Logo.png';
-import { FaSearch, FaFilter, FaHeart, FaShoppingCart, FaBook, FaUser } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaHeart, FaShoppingCart, FaBook, FaUser, FaHome, FaCheckCircle, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
 
 function Dashboard() {
   const [books, setBooks] = useState([]);
@@ -12,6 +12,7 @@ function Dashboard() {
   const [category, setCategory] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
 
   const categories = [
@@ -57,6 +58,10 @@ function Dashboard() {
     fetchBooks();
   }, []);
 
+  useEffect(() => {
+    handleFilter();
+  }, [searchQuery, category, sortBy, books]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     let query = searchQuery.trim() || 'bestseller';
@@ -68,10 +73,9 @@ function Dashboard() {
     fetchBooks(query, sortBy);
   };
 
-  const handleFilter = useCallback(() => {
+  const handleFilter = () => {
     let filtered = [...books];
 
-    // Filter by search query in title or author
     if (searchQuery) {
       filtered = filtered.filter(book => {
         const title = book.volumeInfo?.title?.toLowerCase() || '';
@@ -81,7 +85,6 @@ function Dashboard() {
       });
     }
 
-    // Sort books
     if (sortBy === 'title') {
       filtered.sort((a, b) => {
         const titleA = a.volumeInfo?.title || '';
@@ -103,11 +106,7 @@ function Dashboard() {
     }
 
     setFilteredBooks(filtered);
-  }, [books, searchQuery, sortBy]);
-
-  useEffect(() => {
-    handleFilter();
-  }, [handleFilter]);
+  };
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -117,82 +116,142 @@ function Dashboard() {
 
   const cartCount = JSON.parse(localStorage.getItem('cart'))?.length || 0;
   const wishlistCount = JSON.parse(localStorage.getItem('wishlist'))?.length || 0;
+  const readingListCount = JSON.parse(localStorage.getItem('readingList'))?.length || 0;
+  const completedCount = JSON.parse(localStorage.getItem('completedBooks'))?.length || 0;
+
+  const menuItems = [
+    { icon: FaHome, label: 'Dashboard', path: '/dashboard', badge: null },
+    { icon: FaBook, label: 'Reading List', path: '/reading-list', badge: readingListCount },
+    { icon: FaCheckCircle, label: 'Completed', path: '/reading-list', badge: completedCount },
+    { icon: FaHeart, label: 'Wishlist', path: '/wishlist', badge: wishlistCount },
+    { icon: FaShoppingCart, label: 'Cart', path: '/cart', badge: cartCount },
+    { icon: FaUser, label: 'Profile', path: '/profile', badge: null },
+  ];
 
   return (
-    <div>
-      {/* Header */}
-      <div className="fixed-top shadow-sm" style={{ background: "linear-gradient(90deg, #000428 100%, #004e92 0%)", zIndex: 1030 }}>
-        <nav className="navbar navbar-expand-lg navbar-dark py-3">
-          <div className="container-fluid">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="navbar-brand d-flex align-items-center ms-lg-3 fs-3 fw-bold border-0 bg-transparent"
-            >
-              <img src={Image} alt="Logo" width="50" height="40" className="me-2" />
-              <span style={{ color: "#00d4ff" }}>Book</span>
-              <span style={{ color: "#ff8a00" }}>Verse</span>
-            </button>
+    <div className="d-flex" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #000428, #004e92)' }}>
+      {/* Left Sidebar */}
+      <div 
+        className={`${sidebarOpen ? '' : 'd-none d-lg-block'}`}
+        style={{
+          width: sidebarOpen ? '280px' : '0',
+          transition: 'all 0.3s',
+          background: 'linear-gradient(180deg, #000428, #004e92)',
+          position: 'fixed',
+          height: '100vh',
+          overflowY: 'auto',
+          zIndex: 1040,
+          boxShadow: '2px 0 10px rgba(0,0,0,0.3)'
+        }}
+      >
+        {/* Logo Section */}
+        <div className="p-4 text-center border-bottom border-secondary">
+          <img src={Image} alt="Logo" width="60" height="50" className="mb-2" />
+          <h4 className="text-white fw-bold mb-0">
+            <span style={{ color: "#00d4ff" }}>Book</span>
+            <span style={{ color: "#ff8a00" }}>Verse</span>
+          </h4>
+          <p className="text-white-50 small mb-0">Your Digital Library</p>
+        </div>
 
-            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span className="navbar-toggler-icon"></span>
-            </button>
-
-            <div className="collapse navbar-collapse" id="navbarNav">
-              <ul className="navbar-nav mx-auto text-center my-2 my-lg-0">
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white" onClick={() => navigate('/dashboard')}>
-                    Dashboard
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white position-relative" onClick={() => navigate('/reading-list')}>
-                    <FaBook className="me-1" /> Reading List
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white position-relative" onClick={() => navigate('/wishlist')}>
-                    <FaHeart className="me-1" /> Wishlist
-                    {wishlistCount > 0 && (
-                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                        {wishlistCount}
-                      </span>
-                    )}
-                  </button>
-                </li>
-                <li className="nav-item">
-                  <button className="btn btn-link nav-link text-white position-relative" onClick={() => navigate('/cart')}>
-                    <FaShoppingCart className="me-1" /> Cart
-                    {cartCount > 0 && (
-                      <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                        {cartCount}
-                      </span>
-                    )}
-                  </button>
-                </li>
-              </ul>
-
-              <div className="d-flex justify-content-center justify-content-lg-end mt-2 mt-lg-0 gap-2">
-                <button className="btn btn-outline-info rounded-pill" onClick={() => navigate('/profile')}>
-                  <FaUser className="me-1" /> Profile
+        {/* Navigation Menu */}
+        <nav className="p-3">
+          <ul className="list-unstyled">
+            {menuItems.map((item, index) => (
+              <li key={index} className="mb-2">
+                <button
+                  onClick={() => navigate(item.path)}
+                  className="btn w-100 text-start text-white d-flex align-items-center justify-content-between p-3 rounded"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: 'none',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.2)';
+                    e.currentTarget.style.transform = 'translateX(5px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.currentTarget.style.transform = 'translateX(0)';
+                  }}
+                >
+                  <span>
+                    <item.icon className="me-3" />
+                    {item.label}
+                  </span>
+                  {item.badge !== null && item.badge > 0 && (
+                    <span className="badge bg-danger rounded-pill">{item.badge}</span>
+                  )}
                 </button>
-                <button onClick={handleLogout} className="btn btn-danger rounded-pill">
-                  Logout
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Logout Button */}
+        <div className="p-3 mt-auto position-absolute bottom-0 w-100">
+          <button
+            onClick={handleLogout}
+            className="btn btn-danger w-100 d-flex align-items-center justify-content-center p-3 rounded"
+          >
+            <FaSignOutAlt className="me-2" />
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div 
+        style={{
+          marginLeft: sidebarOpen ? '280px' : '0',
+          flex: 1,
+          transition: 'margin-left 0.3s',
+          width: '100%'
+        }}
+      >
+        {/* Top Header */}
+        <div 
+          className="sticky-top shadow-sm"
+          style={{
+            background: 'linear-gradient(90deg, #000428 100%, #004e92 0%)',
+            zIndex: 1030
+          }}
+        >
+          <div className="container-fluid py-3">
+            <div className="d-flex justify-content-between align-items-center">
+              <div className="d-flex align-items-center">
+                <button
+                  className="btn btn-outline-light me-3"
+                  onClick={() => setSidebarOpen(!sidebarOpen)}
+                >
+                  {sidebarOpen ? <FaTimes /> : <FaBars />}
+                </button>
+                <h4 className="text-white mb-0">
+                  Welcome to <span style={{ color: '#00d4ff' }}>BookVerse</span>
+                </h4>
+              </div>
+              
+              <div className="d-flex gap-2">
+                <button 
+                  className="btn btn-outline-light d-flex align-items-center gap-2"
+                  onClick={() => navigate('/profile')}
+                >
+                  <FaUser />
+                  <span className="d-none d-md-inline">Profile</span>
                 </button>
               </div>
             </div>
           </div>
-        </nav>
-      </div>
+        </div>
 
-      {/* Main Content */}
-      <section style={{ background: 'linear-gradient(135deg, #000428, #004e92)', minHeight: '100vh', paddingTop: '100px' }}>
-        <div className="container py-4">
+        {/* Main Content */}
+        <div className="container-fluid py-4">
           {/* Search and Filter Section */}
           <div className="card shadow-lg border-0 mb-4">
             <div className="card-body p-4">
               <form onSubmit={handleSearch}>
                 <div className="row g-3">
-                  {/* Search Input */}
                   <div className="col-md-5">
                     <div className="input-group">
                       <span className="input-group-text bg-primary text-white">
@@ -208,7 +267,6 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Category Filter */}
                   <div className="col-md-3">
                     <div className="input-group">
                       <span className="input-group-text bg-info text-white">
@@ -228,7 +286,6 @@ function Dashboard() {
                     </div>
                   </div>
 
-                  {/* Sort By */}
                   <div className="col-md-2">
                     <select
                       className="form-select"
@@ -242,7 +299,6 @@ function Dashboard() {
                     </select>
                   </div>
 
-                  {/* Search Button */}
                   <div className="col-md-2">
                     <button type="submit" className="btn btn-success w-100" disabled={loading}>
                       {loading ? 'Searching...' : 'Search'}
@@ -255,9 +311,9 @@ function Dashboard() {
 
           {/* Results Count */}
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <h4 className="text-white mb-0">
+            <h5 className="text-white mb-0">
               {filteredBooks.length} Book{filteredBooks.length !== 1 ? 's' : ''} Found
-            </h4>
+            </h5>
           </div>
 
           {/* Error Message */}
@@ -275,7 +331,14 @@ function Dashboard() {
             ) : filteredBooks.length === 0 ? (
               <div className="text-center text-white py-5">
                 <h5>No books found matching your criteria.</h5>
-                <button className="btn btn-warning mt-3" onClick={() => { setSearchQuery(''); setCategory('all'); fetchBooks(); }}>
+                <button 
+                  className="btn btn-warning mt-3" 
+                  onClick={() => { 
+                    setSearchQuery(''); 
+                    setCategory('all'); 
+                    fetchBooks(); 
+                  }}
+                >
                   Reset Filters
                 </button>
               </div>
@@ -329,7 +392,16 @@ function Dashboard() {
             )}
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="d-lg-none position-fixed top-0 start-0 w-100 h-100 bg-dark"
+          style={{ opacity: 0.5, zIndex: 1035 }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
     </div>
   );
 }

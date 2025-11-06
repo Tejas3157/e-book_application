@@ -6,6 +6,7 @@ import { FaHome, FaBook, FaCheckCircle, FaHeart, FaShoppingCart, FaUser, FaSignO
 function DashboardLayout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
+  const [userName, setUserName] = useState('User');
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -13,7 +14,6 @@ function DashboardLayout({ children }) {
     const handleResize = () => {
       const mobile = window.innerWidth < 992;
       setIsMobile(mobile);
-      // Close sidebar when switching to mobile view
       if (mobile) {
         setSidebarOpen(false);
       }
@@ -22,6 +22,17 @@ function DashboardLayout({ children }) {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    // Get username from localStorage
+    const userProfile = JSON.parse(localStorage.getItem('userProfile'));
+    if (userProfile && userProfile.firstName) {
+      setUserName(userProfile.firstName);
+    } else {
+      // Default to "Admin" if no profile exists
+      setUserName('Admin');
+    }
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem('userToken');
@@ -82,13 +93,15 @@ function DashboardLayout({ children }) {
             </div>
             
             <div className="d-flex gap-2 align-items-center">
-              <span className="text-white d-none d-md-inline small">Welcome back!</span>
+              <span className="text-white d-none d-md-inline small">
+                Welcome, <span className="fw-bold" style={{ color: '#00d4ff' }}>{userName}</span>!
+              </span>
               <button 
                 className="btn btn-outline-light btn-sm d-none d-lg-inline-flex align-items-center gap-2"
                 onClick={() => navigate('/profile')}
               >
                 <FaUser />
-                Profile
+                {userName}
               </button>
               <button 
                 className="btn btn-danger btn-sm d-none d-lg-inline-flex align-items-center gap-2"
@@ -122,6 +135,7 @@ function DashboardLayout({ children }) {
             handleLogout={handleLogout}
             location={location}
             isMobile={false}
+            userName={userName}
           />
         </div>
 
@@ -152,6 +166,7 @@ function DashboardLayout({ children }) {
                 handleLogout={handleLogout}
                 location={location}
                 isMobile={true}
+                userName={userName}
               />
             </div>
           </>
@@ -177,19 +192,20 @@ function DashboardLayout({ children }) {
 }
 
 // Sidebar Content Component
-function SidebarContent({ menuItems, handleMenuClick, handleLogout, location, isMobile }) {
+function SidebarContent({ menuItems, handleMenuClick, handleLogout, location, isMobile, userName }) {
   return (
     <>
-      {/* Logo Section - Only on mobile */}
-      {isMobile && (
-        <div className="p-4 text-center border-bottom border-secondary">
-          <h5 className="text-white fw-bold mb-0">
-            <span style={{ color: "#00d4ff" }}>Book</span>
-            <span style={{ color: "#ff8a00" }}>Verse</span>
-          </h5>
-          <p className="text-white-50 small mb-0">Your Digital Library</p>
+      {/* User Info Section */}
+      <div className="p-4 text-center border-bottom border-secondary">
+        <div 
+          className="mx-auto mb-2 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
+          style={{ width: '80px', height: '80px', fontSize: '36px' }}
+        >
+          <FaUser />
         </div>
-      )}
+        <h6 className="text-white fw-bold mb-0">{userName}</h6>
+        <p className="text-white-50 small mb-0">Reader</p>
+      </div>
 
       {/* Navigation Menu */}
       <nav className="p-3">

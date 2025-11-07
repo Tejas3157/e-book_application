@@ -167,7 +167,7 @@ function Footer() {
               </li>
               <li className="mb-2">
                 <a 
-                  href="#" 
+                  href="#home" 
                   className="text-white-50 text-decoration-none"
                   style={{ transition: "color 0.3s" }}
                   onMouseEnter={(e) => e.target.style.color = "#ff8a00"}
@@ -178,7 +178,7 @@ function Footer() {
               </li>
               <li className="mb-2">
                 <a 
-                  href="#" 
+                  href="#home" 
                   className="text-white-50 text-decoration-none"
                   style={{ transition: "color 0.3s" }}
                   onMouseEnter={(e) => e.target.style.color = "#ff8a00"}

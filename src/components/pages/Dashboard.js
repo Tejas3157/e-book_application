@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import { FaSearch, FaFilter, FaTimes, FaHeart, FaShoppingCart, FaBook, FaStar } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaHeart, FaShoppingCart, FaBook, FaStar } from 'react-icons/fa';
 
 function Dashboard() {
   const [books, setBooks] = useState([]);
@@ -15,7 +14,6 @@ function Dashboard() {
   const [selectedBook, setSelectedBook] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
-  const navigate = useNavigate();
 
   const categories = [
     'all', 'fiction', 'non-fiction', 'science', 'history', 
@@ -56,26 +54,7 @@ function Dashboard() {
     }
   };
 
-  useEffect(() => {
-    fetchBooks();
-  }, []);
-
-  useEffect(() => {
-    handleFilter();
-  }, [searchQuery, sortBy, books]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    let query = searchQuery.trim() || 'bestseller';
-    
-    if (category !== 'all') {
-      query += `+subject:${category}`;
-    }
-    
-    fetchBooks(query, sortBy);
-  };
-
-  const handleFilter = () => {
+  const handleFilter = useCallback(() => {
     let filtered = [...books];
 
     if (searchQuery) {
@@ -108,6 +87,25 @@ function Dashboard() {
     }
 
     setFilteredBooks(filtered);
+  }, [books, searchQuery, sortBy]);
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
+
+  useEffect(() => {
+    handleFilter();
+  }, [handleFilter]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    let query = searchQuery.trim() || 'bestseller';
+    
+    if (category !== 'all') {
+      query += `+subject:${category}`;
+    }
+    
+    fetchBooks(query, sortBy);
   };
 
   const handleBookClick = async (bookId) => {
@@ -249,7 +247,7 @@ function Dashboard() {
       {error && <div className="alert alert-danger">{error}</div>}
 
       {/* Books Grid */}
-      <div className="row g-3">
+      <div className="row g-3 g-md-4">
         {loading ? (
           <div className="col-12 text-center text-white py-5">
             <div className="spinner-border" role="status">
@@ -280,7 +278,7 @@ function Dashboard() {
             const rating = info.averageRating || '—';
 
             return (
-              <div className="col-6 col-sm-4 col-md-3 col-xl-2 mb-3" key={item.id}>
+              <div className="col-6 col-sm-4 col-lg-3 col-xl-2-4 col-xxl-2 mb-3" key={item.id}>
                 <div 
                   className="card h-100 shadow-sm border-0" 
                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
@@ -293,24 +291,37 @@ function Dashboard() {
                       src={image}
                       alt={title}
                       className="card-img-top"
-                      style={{ height: '250px', objectFit: 'cover', borderRadius: '8px 8px 0 0' }}
+                      style={{ 
+                        height: '280px', 
+                        objectFit: 'cover', 
+                        borderRadius: '8px 8px 0 0',
+                        width: '100%'
+                      }}
                     />
                   ) : (
                     <div
                       className="card-img-top d-flex align-items-center justify-content-center bg-light text-muted"
-                      style={{ height: '250px', borderRadius: '8px 8px 0 0' }}
+                      style={{ height: '280px', borderRadius: '8px 8px 0 0' }}
                     >
                       No Image
                     </div>
                   )}
-                  <div className="card-body p-2">
-                    <h6 className="card-title mb-1 text-truncate" style={{ fontSize: '0.9rem', fontWeight: 600 }}>
+                  <div className="card-body p-3">
+                    <h6 
+                      className="card-title mb-2 text-truncate" 
+                      style={{ fontSize: '0.95rem', fontWeight: 600 }}
+                      title={title}
+                    >
                       {title}
                     </h6>
-                    <p className="card-text mb-0 text-truncate" style={{ fontSize: '0.75rem', color: '#888' }}>
+                    <p 
+                      className="card-text mb-1 text-truncate" 
+                      style={{ fontSize: '0.8rem', color: '#666' }}
+                      title={authors}
+                    >
                       {authors}
                     </p>
-                    <p className="card-text mt-1" style={{ fontSize: '0.75rem', color: '#888' }}>
+                    <p className="card-text mt-2 mb-0" style={{ fontSize: '0.85rem', color: '#888' }}>
                       ⭐ {rating}
                     </p>
                   </div>
@@ -441,6 +452,32 @@ function Dashboard() {
           </div>
         </div>
       )}
+
+      <style>{`
+        /* 5 books per row for 1200px to 1500px */
+        @media (min-width: 1200px) and (max-width: 1499px) {
+          .col-xl-2-4 {
+            flex: 0 0 auto;
+            width: 20%;
+          }
+        }
+        
+        /* 6 books per row for screens 1500px and above */
+        @media (min-width: 1500px) {
+          .col-xxl-2 {
+            flex: 0 0 auto;
+            width: 16.666667%;
+          }
+        }
+        
+        /* Ensure proper spacing on all screen sizes */
+        @media (max-width: 575.98px) {
+          .col-6 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+          }
+        }
+      `}</style>
     </DashboardLayout>
   );
 }

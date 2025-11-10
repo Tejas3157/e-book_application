@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import { FaSearch, FaFilter } from 'react-icons/fa';
+import { FaSearch, FaFilter, FaTimes, FaHeart, FaShoppingCart, FaBook, FaStar } from 'react-icons/fa';
 
 function Dashboard() {
   const [books, setBooks] = useState([]);
@@ -12,6 +12,9 @@ function Dashboard() {
   const [category, setCategory] = useState('all');
   const [sortBy, setSortBy] = useState('relevance');
   const [loading, setLoading] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: '' });
   const navigate = useNavigate();
 
   const categories = [
@@ -57,6 +60,9 @@ function Dashboard() {
     fetchBooks();
   }, []);
 
+  useEffect(() => {
+    handleFilter();
+  }, [searchQuery, sortBy, books]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -69,7 +75,7 @@ function Dashboard() {
     fetchBooks(query, sortBy);
   };
 
-  const handleFilter = useCallback(() => {
+  const handleFilter = () => {
     let filtered = [...books];
 
     if (searchQuery) {
@@ -78,15 +84,6 @@ function Dashboard() {
         const authors = book.volumeInfo?.authors?.join(' ').toLowerCase() || '';
         return title.includes(searchQuery.toLowerCase()) || 
                authors.includes(searchQuery.toLowerCase());
-      });
-    }
-
-    // client-side category filtering when category is not 'all'
-    if (category && category !== 'all') {
-      filtered = filtered.filter(book => {
-        const cats = book.volumeInfo?.categories || [];
-        // categories can be strings like "Fiction" or arrays; normalize to array
-        return cats.some(cat => cat.toLowerCase().includes(category.toLowerCase()));
       });
     }
 
@@ -111,11 +108,71 @@ function Dashboard() {
     }
 
     setFilteredBooks(filtered);
-  }, [books, searchQuery, sortBy, category]);
+  };
 
-  useEffect(() => {
-    handleFilter();
-  }, [handleFilter]);
+  const handleBookClick = async (bookId) => {
+    try {
+      const response = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes/${bookId}`,
+        {
+          params: {
+            key: 'AIzaSyBgmIp6nmfzvr76PTjxLiMB9_VetnY7vjE'
+          }
+        }
+      );
+      setSelectedBook(response.data);
+      setShowModal(true);
+    } catch (err) {
+      console.error('Error fetching book details:', err);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedBook(null);
+  };
+
+  const addToWishlist = () => {
+    const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+    const exists = wishlist.find(item => item.id === selectedBook.id);
+    
+    if (!exists) {
+      wishlist.push(selectedBook);
+      localStorage.setItem('wishlist', JSON.stringify(wishlist));
+      setToast({ show: true, message: 'Added to wishlist!', type: 'success' });
+    } else {
+      setToast({ show: true, message: 'Already in wishlist!', type: 'warning' });
+    }
+    setTimeout(() => setToast({ show: false, message: '', type: '' }), 2000);
+  };
+
+  const addToCart = () => {
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const exists = cart.find(item => item.id === selectedBook.id);
+    
+    if (!exists) {
+      cart.push(selectedBook);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      setToast({ show: true, message: 'Added to cart!', type: 'success' });
+    } else {
+      setToast({ show: true, message: 'Already in cart!', type: 'warning' });
+    }
+    setTimeout(() => setToast({ show: false, message: '', type: '' }), 2000);
+  };
+
+  const addToReadingList = () => {
+    const readingList = JSON.parse(localStorage.getItem('readingList')) || [];
+    const exists = readingList.find(item => item.id === selectedBook.id);
+    
+    if (!exists) {
+      readingList.push(selectedBook);
+      localStorage.setItem('readingList', JSON.stringify(readingList));
+      setToast({ show: true, message: 'Added to reading list!', type: 'success' });
+    } else {
+      setToast({ show: true, message: 'Already in reading list!', type: 'warning' });
+    }
+    setTimeout(() => setToast({ show: false, message: '', type: '' }), 2000);
+  };
 
   return (
     <DashboardLayout>
@@ -229,7 +286,7 @@ function Dashboard() {
                   style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
                   onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
                   onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                  onClick={() => navigate(`/book/${item.id}`)}
+                  onClick={() => handleBookClick(item.id)}
                 >
                   {image ? (
                     <img
@@ -263,6 +320,127 @@ function Dashboard() {
           })
         )}
       </div>
+
+      {/* Book Details Modal */}
+      {showModal && selectedBook && (
+        <>
+          <div 
+            className="modal-backdrop fade show" 
+            style={{ zIndex: 1040 }}
+            onClick={closeModal}
+          />
+          <div 
+            className="modal fade show d-block" 
+            style={{ zIndex: 1050 }}
+            tabIndex="-1"
+          >
+            <div className="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title fw-bold">Book Details</h5>
+                  <button 
+                    type="button" 
+                    className="btn-close" 
+                    onClick={closeModal}
+                  />
+                </div>
+                <div className="modal-body">
+                  <div className="row">
+                    <div className="col-md-4 text-center mb-3 mb-md-0">
+                      <img
+                        src={
+                          selectedBook.volumeInfo.imageLinks?.thumbnail ||
+                          selectedBook.volumeInfo.imageLinks?.smallThumbnail ||
+                          'https://via.placeholder.com/300x400?text=No+Image'
+                        }
+                        alt={selectedBook.volumeInfo.title}
+                        className="img-fluid rounded shadow"
+                        style={{ maxHeight: '400px' }}
+                      />
+                    </div>
+                    <div className="col-md-8">
+                      <h3 className="fw-bold mb-3">{selectedBook.volumeInfo.title}</h3>
+                      <p className="text-muted mb-2">
+                        <strong>Author(s):</strong> {selectedBook.volumeInfo.authors?.join(', ') || 'Unknown'}
+                      </p>
+                      <p className="text-muted mb-2">
+                        <strong>Publisher:</strong> {selectedBook.volumeInfo.publisher || 'N/A'}
+                      </p>
+                      <p className="text-muted mb-2">
+                        <strong>Published:</strong> {selectedBook.volumeInfo.publishedDate || 'N/A'}
+                      </p>
+                      <p className="text-muted mb-2">
+                        <strong>Pages:</strong> {selectedBook.volumeInfo.pageCount || 'N/A'}
+                      </p>
+                      <p className="text-muted mb-2">
+                        <strong>Categories:</strong> {selectedBook.volumeInfo.categories?.join(', ') || 'N/A'}
+                      </p>
+                      <div className="mb-3">
+                        <strong>Rating:</strong>{' '}
+                        <span className="text-warning">
+                          <FaStar /> {selectedBook.volumeInfo.averageRating || 'No rating'}
+                        </span>
+                        {selectedBook.volumeInfo.ratingsCount && (
+                          <span className="text-muted ms-2">
+                            ({selectedBook.volumeInfo.ratingsCount} ratings)
+                          </span>
+                        )}
+                      </div>
+                      <div className="mb-3">
+                        <strong>Description:</strong>
+                        <div 
+                          className="mt-2" 
+                          style={{ maxHeight: '200px', overflowY: 'auto', textAlign: 'justify' }}
+                          dangerouslySetInnerHTML={{ 
+                            __html: selectedBook.volumeInfo.description || 'No description available.' 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-danger" onClick={addToWishlist}>
+                    <FaHeart className="me-2" />
+                    Add to Wishlist
+                  </button>
+                  <button className="btn btn-success" onClick={addToCart}>
+                    <FaShoppingCart className="me-2" />
+                    Add to Cart
+                  </button>
+                  <button className="btn btn-info text-white" onClick={addToReadingList}>
+                    <FaBook className="me-2" />
+                    Add to Reading List
+                  </button>
+                  {selectedBook.volumeInfo.previewLink && (
+                    <a 
+                      href={selectedBook.volumeInfo.previewLink} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="btn btn-warning"
+                    >
+                      Preview Book
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div
+          className={`toast show align-items-center text-bg-${toast.type} border-0 position-fixed bottom-0 end-0 m-3`}
+          style={{ zIndex: 9999 }}
+          role="alert"
+        >
+          <div className="d-flex">
+            <div className="toast-body">{toast.message}</div>
+          </div>
+        </div>
+      )}
     </DashboardLayout>
   );
 }

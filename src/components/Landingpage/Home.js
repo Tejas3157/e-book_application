@@ -385,7 +385,33 @@ function Home() {
             >
                 <div className="container py-5">
                     <div className="row g-4 align-items-center">
-                        {/* Left Side - FAQ Questions */}
+                        {/* Left Side - Help Text with Animation */}
+                        <div className="col-lg-5">
+                            <div className="text-center p-4 rounded" style={{ background: "rgba(255, 255, 255, 0.05)" }}>
+                                {/* Lottie Animation */}
+                                <div style={{ maxWidth: "300px", margin: "0 auto" }}>
+                                    <DotLottieReact
+                                        src="https://lottie.host/986fdb44-fbd4-4d8d-b2d5-c57f4ae06fac/NFtKW7c6Hd.lottie"
+                                        loop
+                                        autoplay
+                                    />
+                                </div>
+                                
+                                <h3 className="fw-bold mt-4 mb-3">Any Questions?</h3>
+                                <p className="lead mb-3">Find answers here.</p>
+                                <p className="text-white-50 mb-4">
+                                    Don't find your answer here? Just send us a message for any query.
+                                </p>
+                                <a 
+                                    href="#contact" 
+                                    className="btn btn-warning fw-semibold px-4 py-2 rounded-pill"
+                                >
+                                    Contact Us
+                                </a>
+                            </div>
+                        </div>
+
+                        {/* Right Side - FAQ Questions */}
                         <div className="col-lg-7">
                             <h2 className="fw-bold display-5 mb-4">Frequently Asked Questions</h2>
                             <div className="accordion" id="faqAccordion">
@@ -413,32 +439,6 @@ function Home() {
                                         </div>
                                     </div>
                                 ))}
-                            </div>
-                        </div>
-
-                        {/* Right Side - Help Text with Animation */}
-                        <div className="col-lg-5">
-                            <div className="text-center p-4 rounded" style={{ background: "rgba(255, 255, 255, 0.05)" }}>
-                                {/* Lottie Animation */}
-                                <div style={{ maxWidth: "300px", margin: "0 auto" }}>
-                                    <DotLottieReact
-                                        src="https://lottie.host/986fdb44-fbd4-4d8d-b2d5-c57f4ae06fac/NFtKW7c6Hd.lottie"
-                                        loop
-                                        autoplay
-                                    />
-                                </div>
-                                
-                                <h3 className="fw-bold mt-4 mb-3">Any Questions?</h3>
-                                <p className="lead mb-3">Find answers here.</p>
-                                <p className="text-white-50 mb-4">
-                                    Don't find your answer here? Just send us a message for any query.
-                                </p>
-                                <a 
-                                    href="#contact" 
-                                    className="btn btn-warning btn-lg fw-semibold px-5 py-3 rounded-pill"
-                                >
-                                    Contact Us
-                                </a>
                             </div>
                         </div>
                     </div>

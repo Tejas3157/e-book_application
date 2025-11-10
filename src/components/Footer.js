@@ -166,26 +166,26 @@ function Footer() {
                 </a>
               </li>
               <li className="mb-2">
-                <a 
-                  href="#home" 
+                <Link
+                  to="/privacy-policy" 
                   className="text-white-50 text-decoration-none"
                   style={{ transition: "color 0.3s" }}
                   onMouseEnter={(e) => e.target.style.color = "#ff8a00"}
                   onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.5)"}
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li className="mb-2">
-                <a 
-                  href="#home" 
+                <Link
+                  to="/terms-of-service" 
                   className="text-white-50 text-decoration-none"
                   style={{ transition: "color 0.3s" }}
                   onMouseEnter={(e) => e.target.style.color = "#ff8a00"}
                   onMouseLeave={(e) => e.target.style.color = "rgba(255,255,255,0.5)"}
                 >
                   Terms of Service
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

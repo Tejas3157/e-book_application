@@ -17,6 +17,8 @@ import Cart from './components/pages/Cart';
 import BookReader from './components/pages/BookReader';
 import Checkout from './components/pages/Checkout';
 import NotFound from './components/pages/NotFound';
+import TermsOfService from './components/pages/TermsOfService';
+import PrivacyPolicy from './components/pages/PrivacyPolicy';
 
 
 function App() {
@@ -31,11 +33,13 @@ function App() {
             <Footer />
           </>
         } />
-        
+
         {/* Auth Routes (no header/footer) */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+
         {/* Protected Routes */}
         <Route path="/dashboard" element={
           <ProtectedRoute>

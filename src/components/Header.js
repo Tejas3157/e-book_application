@@ -3,6 +3,14 @@ import Image from './Images/Logo.png';
 import { Link } from 'react-router-dom';
 
 function Header() {
+    const handleNavLinkClick = () => {
+        // Close the navbar on mobile when a link is clicked
+        const navbarCollapse = document.querySelector('.navbar-collapse');
+        if (navbarCollapse) {
+            navbarCollapse.classList.remove('show');
+        }
+    };
+
     return (
         <div>
             <div
@@ -43,16 +51,42 @@ function Header() {
                         {/* Links */}
                         <div className="collapse navbar-collapse" id="navbarNav">
                             <ul className="navbar-nav mx-auto text-center h4 my-2 my-lg-0">
-                                {['Home', 'About', 'Contact'].map((item) => (
-                                    <li key={item} className="nav-item mx-lg-3 position-relative">
-                                        <a
-                                            className="nav-link fw-semibold nav-animate"
-                                            href={item === 'Home' ? '#home' : `#${item.toLowerCase()}`}
-                                        >
-                                            {item}
-                                        </a>
-                                    </li>
-                                ))}
+                                <li className="nav-item mx-lg-3 position-relative">
+                                    <a
+                                        className="nav-link fw-semibold nav-animate"
+                                        href="#home"
+                                        onClick={handleNavLinkClick}
+                                    >
+                                        Home
+                                    </a>
+                                </li>
+                                <li className="nav-item mx-lg-3 position-relative">
+                                    <a
+                                        className="nav-link fw-semibold nav-animate"
+                                        href="#about"
+                                        onClick={handleNavLinkClick}
+                                    >
+                                        About
+                                    </a>
+                                </li>
+                                <li className="nav-item mx-lg-3 position-relative">
+                                    <a
+                                        className="nav-link fw-semibold nav-animate"
+                                        href="#contact"
+                                        onClick={handleNavLinkClick}
+                                    >
+                                        Contact
+                                    </a>
+                                </li>
+                                <li className="nav-item mx-lg-3 position-relative">
+                                    <a
+                                        className="nav-link fw-semibold nav-animate"
+                                        href="#faq"
+                                        onClick={handleNavLinkClick}
+                                    >
+                                        FAQ's
+                                    </a>
+                                </li>
                             </ul>
 
                             {/* Buttons */}

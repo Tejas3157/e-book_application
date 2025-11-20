@@ -1,10 +1,11 @@
+// ==================== Login.js ====================
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { FaUser, FaLock } from 'react-icons/fa';
+import { FaUser, FaLock, FaHome } from 'react-icons/fa';
 
 function Login() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState(''); // email or phone
   const [password, setPassword] = useState('');
   const [toast, setToast] = useState({ show: false, message: '' });
   const [loading, setLoading] = useState(false);
@@ -14,7 +15,10 @@ function Login() {
   useEffect(() => {
     let timer;
     if (toast.show) {
-      timer = setTimeout(() => setToast({ show: false, message: '' }), 2000);
+      timer = setTimeout(
+        () => setToast({ show: false, message: '' }),
+        2000
+      );
     }
     return () => clearTimeout(timer);
   }, [toast.show]);
@@ -25,9 +29,24 @@ function Login() {
 
     setTimeout(() => {
       setLoading(false);
-      if (email === 'admin' && password === 'admin') {
-        localStorage.setItem('userToken', 'sampleToken'); // ✅ Add this line
-        navigate('/dashboard');
+
+      const storedUserString = localStorage.getItem('user');
+
+      if (!storedUserString) {
+        setToast({ show: true, message: 'No user found. Please sign up first.' });
+        return;
+      }
+
+      const storedUser = JSON.parse(storedUserString);
+
+      const isIdentifierMatch =
+        identifier === storedUser.email || identifier === storedUser.phone;
+
+      const isPasswordMatch = password === storedUser.password;
+
+      if (isIdentifierMatch && isPasswordMatch) {
+        localStorage.setItem('userToken', 'sampleToken');
+        navigate('/dashboard'); // or '/profile' if you want direct profile
       } else {
         setToast({ show: true, message: 'Invalid credentials' });
       }
@@ -41,12 +60,25 @@ function Login() {
         background: 'linear-gradient(135deg,  #000428, #004e92)',
       }}
     >
-      <div className="card shadow-lg border-0" style={{ width: '100%', maxWidth: 420 }}>
+      <div
+        className="card shadow-lg border-0"
+        style={{ width: '100%', maxWidth: 420 }}
+      >
         <div className="card-body p-5">
+          <div className="d-flex justify-content-end">
+            <button
+              type="button"
+              className="btn btn-light shadow-sm"
+              onClick={() => navigate('/')}
+            >
+              <FaHome size={18} />
+            </button>
+          </div>
+
           <h2 className="text-center mb-4 fw-bold text-primary">Log In</h2>
           <form onSubmit={handleSubmit}>
             <div className="mb-3 position-relative">
-              <label className="form-label fw-semibold">Username</label>
+              <label className="form-label fw-semibold">Email or Phone</label>
               <div className="input-group">
                 <span className="input-group-text bg-white">
                   <FaUser />
@@ -55,8 +87,8 @@ function Login() {
                   type="text"
                   className="form-control"
                   placeholder="Email or Phone Number"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
                   required
                 />
               </div>
@@ -91,7 +123,10 @@ function Login() {
           {/* Sign-up redirect */}
           <div className="text-center mt-4">
             <span className="text-muted">Don't have an account? </span>
-            <Link to="/signup" className="text-decoration-none fw-semibold text-primary">
+            <Link
+              to="/signup"
+              className="text-decoration-none fw-semibold text-primary"
+            >
               Sign up
             </Link>
           </div>

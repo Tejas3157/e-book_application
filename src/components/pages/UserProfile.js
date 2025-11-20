@@ -2,13 +2,22 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from './DashboardLayout';
-import { FaUser, FaEnvelope, FaPhone, FaEdit, FaBook, FaHeart, FaShoppingCart, FaCheckCircle } from 'react-icons/fa';
+import {
+  FaUser,
+  FaEnvelope,
+  FaPhone,
+  FaEdit,
+  FaBook,
+  FaHeart,
+  FaShoppingCart,
+  FaCheckCircle,
+} from 'react-icons/fa';
 
 function UserProfile() {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: '' });
-  
+
   const [userData, setUserData] = useState({
     firstName: 'John',
     lastName: 'Doe',
@@ -16,24 +25,48 @@ function UserProfile() {
     phone: '+91 9876543210',
     bio: 'Book lover and avid reader',
     favoriteGenre: 'Fiction',
-    joinDate: 'January 2025'
+    joinDate: 'January 2025',
   });
 
   const [stats, setStats] = useState({
     readingList: 0,
     completed: 0,
     wishlist: 0,
-    cart: 0
+    cart: 0,
   });
 
+  // Load profile and stats, and protect route
   useEffect(() => {
+    const token = localStorage.getItem('userToken');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
     const savedProfile = JSON.parse(localStorage.getItem('userProfile'));
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+
     if (savedProfile) {
-      setUserData(savedProfile);
+      setUserData((prev) => ({
+        ...prev,
+        ...savedProfile,
+      }));
+    } else if (storedUser) {
+      setUserData((prev) => ({
+        ...prev,
+        firstName: storedUser.firstName || prev.firstName,
+        lastName: storedUser.lastName || prev.lastName,
+        email: storedUser.email || prev.email,
+        phone: storedUser.phone || prev.phone,
+        bio: storedUser.bio || prev.bio,
+        favoriteGenre: storedUser.favoriteGenre || prev.favoriteGenre,
+        joinDate: storedUser.joinDate || prev.joinDate,
+      }));
     }
 
     const readingList = JSON.parse(localStorage.getItem('readingList')) || [];
-    const completedBooks = JSON.parse(localStorage.getItem('completedBooks')) || [];
+    const completedBooks =
+      JSON.parse(localStorage.getItem('completedBooks')) || [];
     const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
@@ -41,13 +74,17 @@ function UserProfile() {
       readingList: readingList.length,
       completed: completedBooks.length,
       wishlist: wishlist.length,
-      cart: cart.length
+      cart: cart.length,
     });
-  }, []);
+  }, [navigate]);
 
+  // Auto-hide toast
   useEffect(() => {
     if (toast.show) {
-      const timer = setTimeout(() => setToast({ show: false, message: '', type: '' }), 2000);
+      const timer = setTimeout(
+        () => setToast({ show: false, message: '', type: '' }),
+        2000
+      );
       return () => clearTimeout(timer);
     }
   }, [toast.show]);
@@ -55,12 +92,33 @@ function UserProfile() {
   const handleSave = (e) => {
     e.preventDefault();
     localStorage.setItem('userProfile', JSON.stringify(userData));
+
+    // Keep auth user in sync with profile data
+    const storedUser = JSON.parse(localStorage.getItem('user')) || {};
+    localStorage.setItem(
+      'user',
+      JSON.stringify({
+        ...storedUser,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        phone: userData.phone,
+        favoriteGenre: userData.favoriteGenre,
+        bio: userData.bio,
+        joinDate: userData.joinDate,
+      })
+    );
+
     setIsEditing(false);
-    setToast({ show: true, message: 'Profile updated successfully!', type: 'success' });
+    setToast({
+      show: true,
+      message: 'Profile updated successfully!',
+      type: 'success',
+    });
   };
 
   const handleChange = (field, value) => {
-    setUserData(prev => ({ ...prev, [field]: value }));
+    setUserData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -70,18 +128,22 @@ function UserProfile() {
         <div className="col-lg-4">
           <div className="card shadow-lg border-0">
             <div className="card-body text-center p-4">
-              <div 
+              <div
                 className="mx-auto mb-3 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
                 style={{ width: '100px', height: '100px', fontSize: '40px' }}
               >
                 <FaUser />
               </div>
-              <h4 className="fw-bold">{userData.firstName} {userData.lastName}</h4>
+              <h4 className="fw-bold">
+                {userData.firstName} {userData.lastName}
+              </h4>
               <p className="text-muted mb-2">{userData.email}</p>
-              <p className="text-muted small">Member since {userData.joinDate}</p>
-              
+              <p className="text-muted small">
+                Member since {userData.joinDate}
+              </p>
+
               {!isEditing && (
-                <button 
+                <button
                   className="btn btn-primary w-100 mt-3"
                   onClick={() => setIsEditing(true)}
                 >
@@ -133,18 +195,22 @@ function UserProfile() {
           <div className="card shadow-lg border-0">
             <div className="card-body p-4">
               <h4 className="fw-bold mb-4">Profile Information</h4>
-              
+
               <form onSubmit={handleSave}>
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">First Name</label>
                     <div className="input-group">
-                      <span className="input-group-text"><FaUser /></span>
+                      <span className="input-group-text">
+                        <FaUser />
+                      </span>
                       <input
                         type="text"
                         className="form-control"
                         value={userData.firstName}
-                        onChange={(e) => handleChange('firstName', e.target.value)}
+                        onChange={(e) =>
+                          handleChange('firstName', e.target.value)
+                        }
                         disabled={!isEditing}
                         required
                       />
@@ -154,12 +220,16 @@ function UserProfile() {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Last Name</label>
                     <div className="input-group">
-                      <span className="input-group-text"><FaUser /></span>
+                      <span className="input-group-text">
+                        <FaUser />
+                      </span>
                       <input
                         type="text"
                         className="form-control"
                         value={userData.lastName}
-                        onChange={(e) => handleChange('lastName', e.target.value)}
+                        onChange={(e) =>
+                          handleChange('lastName', e.target.value)
+                        }
                         disabled={!isEditing}
                         required
                       />
@@ -169,12 +239,16 @@ function UserProfile() {
                   <div className="col-md-6">
                     <label className="form-label fw-semibold">Email</label>
                     <div className="input-group">
-                      <span className="input-group-text"><FaEnvelope /></span>
+                      <span className="input-group-text">
+                        <FaEnvelope />
+                      </span>
                       <input
                         type="email"
                         className="form-control"
                         value={userData.email}
-                        onChange={(e) => handleChange('email', e.target.value)}
+                        onChange={(e) =>
+                          handleChange('email', e.target.value)
+                        }
                         disabled={!isEditing}
                         required
                       />
@@ -182,25 +256,35 @@ function UserProfile() {
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Phone Number</label>
+                    <label className="form-label fw-semibold">
+                      Phone Number
+                    </label>
                     <div className="input-group">
-                      <span className="input-group-text"><FaPhone /></span>
+                      <span className="input-group-text">
+                        <FaPhone />
+                      </span>
                       <input
                         type="tel"
                         className="form-control"
                         value={userData.phone}
-                        onChange={(e) => handleChange('phone', e.target.value)}
+                        onChange={(e) =>
+                          handleChange('phone', e.target.value)
+                        }
                         disabled={!isEditing}
                       />
                     </div>
                   </div>
 
                   <div className="col-md-6">
-                    <label className="form-label fw-semibold">Favorite Genre</label>
+                    <label className="form-label fw-semibold">
+                      Favorite Genre
+                    </label>
                     <select
                       className="form-select"
                       value={userData.favoriteGenre}
-                      onChange={(e) => handleChange('favoriteGenre', e.target.value)}
+                      onChange={(e) =>
+                        handleChange('favoriteGenre', e.target.value)
+                      }
                       disabled={!isEditing}
                     >
                       <option value="Fiction">Fiction</option>
@@ -228,8 +312,8 @@ function UserProfile() {
 
                   {isEditing && (
                     <div className="col-12 d-flex gap-2 justify-content-end">
-                      <button 
-                        type="button" 
+                      <button
+                        type="button"
                         className="btn btn-secondary"
                         onClick={() => setIsEditing(false)}
                       >
@@ -251,23 +335,39 @@ function UserProfile() {
               <h5 className="fw-bold mb-3">Quick Actions</h5>
               <div className="row g-2">
                 <div className="col-md-6">
-                  <button className="btn btn-outline-primary w-100" onClick={() => navigate('/reading-list')}>
-                    <FaBook className="me-2" />View Reading List
+                  <button
+                    className="btn btn-outline-primary w-100"
+                    onClick={() => navigate('/reading-list')}
+                  >
+                    <FaBook className="me-2" />
+                    View Reading List
                   </button>
                 </div>
                 <div className="col-md-6">
-                  <button className="btn btn-outline-danger w-100" onClick={() => navigate('/wishlist')}>
-                    <FaHeart className="me-2" />View Wishlist
+                  <button
+                    className="btn btn-outline-danger w-100"
+                    onClick={() => navigate('/wishlist')}
+                  >
+                    <FaHeart className="me-2" />
+                    View Wishlist
                   </button>
                 </div>
                 <div className="col-md-6">
-                  <button className="btn btn-outline-success w-100" onClick={() => navigate('/cart')}>
-                    <FaShoppingCart className="me-2" />View Cart
+                  <button
+                    className="btn btn-outline-success w-100"
+                    onClick={() => navigate('/cart')}
+                  >
+                    <FaShoppingCart className="me-2" />
+                    View Cart
                   </button>
                 </div>
                 <div className="col-md-6">
-                  <button className="btn btn-outline-info w-100" onClick={() => navigate('/dashboard')}>
-                    <FaBook className="me-2" />Browse Books
+                  <button
+                    className="btn btn-outline-info w-100"
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    <FaBook className="me-2" />
+                    Browse Books
                   </button>
                 </div>
               </div>
